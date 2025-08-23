@@ -80,24 +80,6 @@ Um sistema completo de tickets de fidelidade desenvolvido em HTML, CSS e JavaScr
 - **Ícones intuitivos** para melhor UX
 - **Tipografia clara** e legível
 
-## 🔧 Estrutura do Projeto
-
-```
-Projeto Pessoal/
-├── index.html          # Página de login
-├── cadastro.html       # Página de cadastro
-├── home.html          # Dashboard principal
-├── css/
-│   ├── style.css      # Estilos globais
-│   ├── home.css       # Estilos do dashboard
-│   └── loginCadastro.css # Estilos de autenticação
-├── js/
-│   ├── home.js        # Lógica do sistema principal
-│   ├── loginCadastro.js # Lógica de autenticação
-│   └── compras.js     # Lógica de compras (futuro)
-└── README.md          # Este arquivo
-```
-
 ## 📋 Funcionalidades Técnicas
 
 ### Sistema de Dados
@@ -161,6 +143,8 @@ Este é um projeto pessoal, mas sugestões e melhorias são bem-vindas!
 Projeto pessoal para fins educacionais e de portfólio.
 
 ## 👨‍💻 Autor
+
+Kauan Adryan (@kauanadryan)
 
 Desenvolvido como projeto pessoal para demonstrar habilidades em desenvolvimento web front-end.
 
