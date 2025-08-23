@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste QR Code - Fidelix</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .qr-tester {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .qr-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .qr-item {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .qr-item h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .qr-code {
+            margin: 15px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .qr-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .test-instructions {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .test-instructions h2 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .test-instructions ol {
+            line-height: 2;
+            margin-left: 20px;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-tester">
+        <a href="home.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+        
+        <div class="test-instructions">
+            <h2><i class="fas fa-qrcode"></i> Teste de Validação de QR Code por Empresa</h2>
+            <ol>
+                <li><strong>Abra o dashboard</strong> e vá para a aba "Compras"</li>
+                <li><strong>Clique em "Iniciar Câmera"</strong> para ativar a leitura</li>
+                <li><strong>Apresente um dos QR Codes abaixo</strong> para a câmera</li>
+                <li><strong>O sistema validará automaticamente</strong> se a empresa existe</li>
+                <li><strong>Confirme a compra</strong> apenas se a validação for bem-sucedida</li>
+            </ol>
+            
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 10px;">
+                <h4><i class="fas fa-info-circle"></i> Como Funciona a Validação:</h4>
+                <ul style="text-align: left; margin: 10px 0;">
+                    <li><strong>QR Code Válido:</strong> Contém nome de empresa cadastrada no sistema</li>
+                    <li><strong>QR Code Inválido:</strong> Empresa não encontrada - mostra erro</li>
+                    <li><strong>Formato Suportado:</strong> Texto simples ou JSON</li>
+                    <li><strong>Validação:</strong> Case-insensitive (não diferencia maiúsculas/minúsculas)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <h3><i class="fas fa-store"></i> QR Codes de Teste</h3>
+            <p>Use estes QR Codes para testar a funcionalidade de leitura. Cada um contém o nome da empresa para validação.</p>
+            
+            <div class="qr-grid">
+                <div class="qr-item">
+                    <h4>Supermercado Central</h4>
+                    <div class="qr-code" id="qr1"></div>
+                    <div class="qr-info">
+                        <strong>Conteúdo:</strong> "Supermercado Central"<br>
+                        <strong>Tipo:</strong> Texto simples<br>
+                        <strong>Validação:</strong> ✅ Empresa reconhecida
+                    </div>
+                </div>
+                
+                <div class="qr-item">
+                    <h4>Farmácia Popular</h4>
+                    <div class="qr-code" id="qr2"></div>
+                    <div class="qr-info">
+                        <strong>Conteúdo:</strong> "Farmácia Popular"<br>
+                        <strong>Tipo:</strong> Texto simples<br>
+                        <strong>Validação:</strong> ✅ Empresa reconhecida
+                    </div>
+                </div>
+                
+                <div class="qr-item">
+                    <h4>Loja de Roupas Fashion</h4>
+                    <div class="qr-code" id="qr3"></div>
+                    <div class="qr-info">
+                        <strong>Conteúdo:</strong> "Loja de Roupas Fashion"<br>
+                        <strong>Tipo:</strong> Texto simples<br>
+                        <strong>Validação:</strong> ✅ Empresa reconhecida
+                    </div>
+                </div>
+                
+                <div class="qr-item">
+                    <h4>QR Code Inválido (Teste)</h4>
+                    <div class="qr-code" id="qr4"></div>
+                    <div class="qr-info">
+                        <strong>Conteúdo:</strong> "Empresa Inexistente"<br>
+                        <strong>Tipo:</strong> Texto simples<br>
+                        <strong>Validação:</strong> ❌ Empresa não encontrada
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <h3><i class="fas fa-qrcode"></i> QR Codes JSON (Avançado)</h3>
+            <p>QR Codes com formato JSON para testes mais avançados:</p>
+            
+            <div class="qr-grid">
+                <div class="qr-item">
+                    <h4>JSON Simples</h4>
+                    <div class="qr-code" id="qr5"></div>
+                    <div class="qr-info">
+                        <strong>Conteúdo:</strong> {"empresa": "Supermercado Central"}<br>
+                        <strong>Tipo:</strong> JSON<br>
+                        <strong>Validação:</strong> ✅ Empresa reconhecida
+                    </div>
+                </div>
+                
+                <div class="qr-item">
+                    <h4>JSON Completo</h4>
+                    <div class="qr-code" id="qr6"></div>
+                    <div class="qr-info">
+                        <strong>Conteúdo:</strong> {"nome": "Farmácia Popular", "tipo": "farmacia"}<br>
+                        <strong>Tipo:</strong> JSON<br>
+                        <strong>Validação:</strong> ✅ Empresa reconhecida
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <h3><i class="fas fa-info-circle"></i> Como Funciona a Validação</h3>
+            <div class="qr-grid">
+                <div class="qr-item">
+                    <h4><i class="fas fa-camera"></i> 1. Iniciar Câmera</h4>
+                    <p>Clique no botão "Iniciar Câmera" para ativar a leitura</p>
+                </div>
+                
+                <div class="qr-item">
+                    <h4><i class="fas fa-qrcode"></i> 2. Apresentar QR Code</h4>
+                    <p>Posicione um dos QR Codes na área da câmera</p>
+                </div>
+                
+                <div class="qr-item">
+                    <h4><i class="fas fa-search"></i> 3. Validação Automática</h4>
+                    <p>O sistema verifica se a empresa existe no banco de dados</p>
+                </div>
+                
+                <div class="qr-item">
+                    <h4><i class="fas fa-check"></i> 4. Confirmação</h4>
+                    <p>Se válido, confirme a compra. Se inválido, erro será exibido</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <h3><i class="fas fa-exclamation-triangle"></i> Cenários de Teste</h3>
+            <div class="qr-grid">
+                <div class="qr-item">
+                    <h4><i class="fas fa-check-circle" style="color: #28a745;"></i> QR Code Válido</h4>
+                    <p>QR Codes com nomes de empresas cadastradas serão aceitos</p>
+                </div>
+                
+                <div class="qr-item">
+                    <h4><i class="fas fa-times-circle" style="color: #dc3545;"></i> QR Code Inválido</h4>
+                    <p>QR Codes com empresas inexistentes mostrarão erro</p>
+                </div>
+                
+                <div class="qr-item">
+                    <h4><i class="fas fa-code" style="color: #17a2b8;"></i> Formato JSON</h4>
+                    <p>Suporte a QR Codes em formato JSON estruturado</p>
+                </div>
+                
+                <div class="qr-item">
+                    <h4><i class="fas fa-shield-alt" style="color: #ffc107;"></i> Segurança</h4>
+                    <p>Validação previne fraudes com QR Codes falsos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gerar QR Codes de teste
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrCodes = [
+                // QR Codes de texto simples
+                { id: 'qr1', data: 'Supermercado Central' },
+                { id: 'qr2', data: 'Farmácia Popular' },
+                { id: 'qr3', data: 'Loja de Roupas Fashion' },
+                { id: 'qr4', data: 'Empresa Inexistente' },
+                
+                // QR Codes JSON
+                { id: 'qr5', data: '{"empresa": "Supermercado Central"}' },
+                { id: 'qr6', data: '{"nome": "Farmácia Popular", "tipo": "farmacia"}' }
+            ];
+
+            qrCodes.forEach(qr => {
+                const qrElement = document.getElementById(qr.id);
+                new QRCode(qrElement, {
+                    text: qr.data,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            });
+        });
+    </script>
+</body>
+</html>
