@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Empresarial - Fidelix</title>
+  <link rel="stylesheet" href="css/loginCadastro.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .empresa-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .empresa-header h1 {
+      color: #667eea;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .empresa-header .empresa-icon {
+      font-size: 3rem;
+      color: #764ba2;
+      margin-bottom: 15px;
+    }
+    
+    .empresa-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    
+    .tipo-login {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 5px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .tipo-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      color: #666;
+    }
+    
+    .tipo-btn.active {
+      background: #667eea;
+      color: white;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+    
+    .form-container {
+      display: none;
+    }
+    
+    .form-container.active {
+      display: block;
+    }
+    
+    .voltar-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s ease;
+    }
+    
+    .voltar-btn:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <button class="voltar-btn" onclick="window.location.href='index.html'">
+    <i class="fas fa-arrow-left"></i> Voltar
+  </button>
+
+  <div class="empresa-header">
+    <div class="empresa-icon">
+      <i class="fas fa-building"></i>
+    </div>
+    <h1>FIDELIX</h1>
+    <p>Portal Empresarial - Gerencie seus cupons de desconto</p>
+  </div>
+
+  <div class="card">
+    <div class="tipo-login">
+      <button class="tipo-btn active" onclick="mostrarForm('login')">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+      <button class="tipo-btn" onclick="mostrarForm('cadastro')">
+        <i class="fas fa-user-plus"></i> Cadastro
+      </button>
+    </div>
+
+    <!-- Formulário de Login -->
+    <div id="loginForm" class="form-container active">
+      <form id="empresaLoginForm">
+        <input type="text" id="cnpjLogin" placeholder="CNPJ" required>
+        <input type="password" id="senhaEmpresaLogin" placeholder="Senha" required>
+        <button type="submit">
+          <i class="fas fa-sign-in-alt"></i> Entrar
+        </button>
+      </form>
+    </div>
+
+    <!-- Formulário de Cadastro -->
+    <div id="cadastroForm" class="form-container">
+      <form id="empresaCadastroForm">
+        <input type="text" id="razaoSocial" placeholder="Razão Social" required>
+        <input type="text" id="cnpjCadastro" placeholder="CNPJ" required>
+        <input type="email" id="emailEmpresa" placeholder="E-mail" required>
+        <input type="text" id="enderecoEmpresa" placeholder="Endereço (Rua e Número)" required>
+        <input type="text" id="telefoneEmpresa" placeholder="Telefone" required>
+        <input type="password" id="senhaEmpresa" placeholder="Senha" required>
+        <input type="password" id="confirmarSenhaEmpresa" placeholder="Confirmar Senha" required>
+        <button type="submit">
+          <i class="fas fa-user-plus"></i> Cadastrar Empresa
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+
+  <script src="js/empresa-login.js"></script>
+</body>
+</html>

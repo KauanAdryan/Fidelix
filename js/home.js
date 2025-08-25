@@ -39,6 +39,7 @@ class FidelixSystem {
         this.cupons = JSON.parse(localStorage.getItem('cupons') || '[]');
         this.lojas = JSON.parse(localStorage.getItem('lojas') || '[]');
         this.historico = JSON.parse(localStorage.getItem('historico') || '[]');
+        const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
 
         console.log('📊 Dados carregados:', {
             compras: this.compras.length,
@@ -47,7 +48,10 @@ class FidelixSystem {
             historico: this.historico.length
         });
 
-        // Se não houver lojas, criar algumas de exemplo
+        // Sincronizar empresas com lojas (garantir que cada empresa tenha uma loja correspondente)
+        this.sincronizarEmpresasComLojas(empresas);
+
+        // Se ainda não houver lojas, criar algumas de exemplo
         if (this.lojas.length === 0) {
             console.log('🏪 Criando lojas de exemplo...');
             this.criarLojasExemplo();
@@ -58,6 +62,72 @@ class FidelixSystem {
         // Atualizar validador de QR Code com as lojas
         if (this.qrValidator) {
             this.qrValidator.setLojas(this.lojas);
+        }
+    }
+
+    // Garante que exista uma loja para cada empresa cadastrada
+    sincronizarEmpresasComLojas(empresas) {
+        let alterou = false;
+
+        empresas.forEach(empresa => {
+            // Tenta encontrar uma loja já vinculada pela empresaId ou por nome
+            let loja = this.lojas.find(l => l.empresaId === empresa.id) ||
+                       this.lojas.find(l => (l.nome && l.nome === empresa.razaoSocial));
+
+            if (!loja) {
+                // Criar nova loja para esta empresa
+                loja = {
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    empresaId: empresa.id,
+                    nome: empresa.razaoSocial,
+                    cnpj: empresa.cnpj,
+                    endereco: empresa.endereco || 'Não informado',
+                    telefone: empresa.telefone || 'Não informado',
+                    comprasNecessarias: empresa.comprasNecessarias || 3,
+                    cupons: []
+                };
+                this.lojas.push(loja);
+                alterou = true;
+            } else {
+                // Atualizar dados essenciais se mudou
+                const campos = ['nome','cnpj','comprasNecessarias'];
+                campos.forEach(c => {
+                    const origem = c === 'nome' ? empresa.razaoSocial : empresa[c];
+                    if (origem && loja[c] !== origem) {
+                        loja[c] = origem;
+                        alterou = true;
+                    }
+                });
+                
+                // Atualizar endereço se mudou
+                if (empresa.endereco && loja.endereco !== empresa.endereco) {
+                    loja.endereco = empresa.endereco;
+                    alterou = true;
+                }
+                
+                if (empresa.telefone && loja.telefone !== empresa.telefone) { 
+                    loja.telefone = empresa.telefone; 
+                    alterou = true; 
+                }
+            }
+
+            // Espelhar cupons da empresa na loja para cálculo de progresso/objetivos
+            if (Array.isArray(empresa.cupons)) {
+                const cuponsEspelhados = empresa.cupons.map(c => ({
+                    desconto: c.desconto,
+                    validade: typeof c.validade === 'number' ? `${c.validade} dias` : c.validade || '30 dias',
+                    comprasNecessarias: c.comprasNecessarias
+                }));
+                const difere = JSON.stringify(loja.cupons || []) !== JSON.stringify(cuponsEspelhados);
+                if (difere) {
+                    loja.cupons = cuponsEspelhados;
+                    alterou = true;
+                }
+            }
+        });
+
+        if (alterou) {
+            localStorage.setItem('lojas', JSON.stringify(this.lojas));
         }
     }
 
@@ -310,10 +380,23 @@ class FidelixSystem {
 
         container.innerHTML = cuponsDisponiveis.map(cupom => {
             const loja = this.lojas.find(l => l.id === cupom.lojaId);
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const empresa = cupom.empresaId ? empresas.find(e => e.id === cupom.empresaId) : null;
+            
+            let cupomInfo = '';
+            if (cupom.descricao) {
+                cupomInfo += `<div class="cupom-descricao">${cupom.descricao}</div>`;
+            }
+            if (cupom.valorMinimo && cupom.valorMinimo > 0) {
+                cupomInfo += `<div class="cupom-valor-minimo">Mínimo: R$ ${cupom.valorMinimo.toFixed(2)}</div>`;
+            }
+            
             return `
-                <div class="cupom-card" onclick="fidelixSystem.usarCupom(${cupom.id})">
+                <div class="cupom-card ${empresa ? 'empresa-cupom' : ''}" onclick="fidelixSystem.usarCupom(${cupom.id})">
                     <div class="cupom-desconto">${cupom.desconto}% OFF</div>
                     <div class="cupom-loja">${loja ? loja.nome : 'Loja não encontrada'}</div>
+                    ${empresa ? '<div class="cupom-empresa"><i class="fas fa-building"></i> Cupom Empresarial</div>' : ''}
+                    ${cupomInfo}
                     <div class="cupom-validade">Válido até ${this.formatarData(cupom.validade)}</div>
                 </div>
             `;
@@ -968,32 +1051,73 @@ class FidelixSystem {
 
         const comprasLoja = this.compras.filter(c => c.lojaId === lojaId).length;
         
-        loja.cupons.forEach(cupomConfig => {
-            if (comprasLoja >= cupomConfig.comprasNecessarias) {
-                // Verificar se já existe um cupom não utilizado
-                const cupomExistente = this.cupons.find(c => 
-                    c.lojaId === lojaId && 
-                    c.desconto === cupomConfig.desconto && 
-                    !c.utilizado
-                );
+        // Verificar cupons das empresas
+        const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+        const empresa = empresas.find(e => e.cnpj === loja.cnpj || e.razaoSocial === loja.nome);
+        
+        if (empresa && empresa.cupons) {
+            empresa.cupons.forEach(cupomEmpresa => {
+                if (comprasLoja >= cupomEmpresa.comprasNecessarias) {
+                    // Verificar se já existe um cupom não utilizado
+                    const cupomExistente = this.cupons.find(c => 
+                        c.lojaId === lojaId && 
+                        c.desconto === cupomEmpresa.desconto && 
+                        !c.utilizado &&
+                        c.empresaId === empresa.id
+                    );
 
-                if (!cupomExistente) {
-                    const novoCupom = {
-                        id: Date.now(),
-                        lojaId: lojaId,
-                        desconto: cupomConfig.desconto,
-                        dataCriacao: new Date().toISOString(),
-                        validade: this.calcularValidade(cupomConfig.validade),
-                        utilizado: false,
-                        comprasNecessarias: cupomConfig.comprasNecessarias
-                    };
+                    if (!cupomExistente) {
+                        const novoCupom = {
+                            id: Date.now(),
+                            lojaId: lojaId,
+                            empresaId: empresa.id,
+                            desconto: cupomEmpresa.desconto,
+                            dataCriacao: new Date().toISOString(),
+                            validade: this.calcularValidadeEmpresa(cupomEmpresa.validade),
+                            utilizado: false,
+                            comprasNecessarias: cupomEmpresa.comprasNecessarias,
+                            descricao: cupomEmpresa.descricao,
+                            valorMinimo: cupomEmpresa.valorMinimo
+                        };
 
-                    this.cupons.push(novoCupom);
-                    this.adicionarHistorico('Cupom desbloqueado', 
-                        `${cupomConfig.desconto}% OFF na ${loja.nome}`, 'cupom');
+                        this.cupons.push(novoCupom);
+                        this.adicionarHistorico('Cupom desbloqueado', 
+                            `${cupomEmpresa.desconto}% OFF na ${loja.nome}`, 'cupom');
+                    }
                 }
-            }
-        });
+            });
+        }
+        
+        // Verificar cupons padrão da loja (mantendo compatibilidade)
+        if (loja.cupons) {
+            loja.cupons.forEach(cupomConfig => {
+                if (comprasLoja >= cupomConfig.comprasNecessarias) {
+                    // Verificar se já existe um cupom não utilizado
+                    const cupomExistente = this.cupons.find(c => 
+                        c.lojaId === lojaId && 
+                        c.desconto === cupomConfig.desconto && 
+                        !c.utilizado &&
+                        !c.empresaId // Cupons padrão não têm empresaId
+                    );
+
+                    if (!cupomExistente) {
+                        const novoCupom = {
+                            id: Date.now(),
+                            lojaId: lojaId,
+                            desconto: cupomConfig.desconto,
+                            dataCriacao: new Date().toISOString(),
+                            validade: this.calcularValidade(cupomConfig.validade),
+                            utilizado: false,
+                            comprasNecessarias: cupomConfig.comprasNecessarias
+                        };
+
+                        this.cupons.push(novoCupom);
+                        this.adicionarHistorico('Cupom desbloqueado', 
+                            `${cupomConfig.desconto}% OFF na ${loja.nome}`, 'cupom');
+                    }
+                }
+            });
+        }
     }
 
     // Usar cupom
@@ -1046,6 +1170,13 @@ class FidelixSystem {
             const meses = parseInt(validade);
             data.setMonth(data.getMonth() + meses);
         }
+        return data.toISOString();
+    }
+
+    // Calcular validade do cupom empresarial (em dias)
+    calcularValidadeEmpresa(dias) {
+        const data = new Date();
+        data.setDate(data.getDate() + parseInt(dias));
         return data.toISOString();
     }
 
@@ -1185,59 +1316,9 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// Debug do sistema
-function debugSistema() {
-    const lojas = JSON.parse(localStorage.getItem('lojas') || '[]');
-    const compras = JSON.parse(localStorage.getItem('compras') || '[]');
-    const cupons = JSON.parse(localStorage.getItem('cupons') || '[]');
-    const historico = JSON.parse(localStorage.getItem('historico') || '[]');
-    
-    console.log('🔍 DEBUG DO SISTEMA:');
-    console.log('🏪 Lojas:', lojas);
-    console.log('🛒 Compras:', compras);
-    console.log('🎫 Cupons:', cupons);
-    console.log('📚 Histórico:', historico);
-    console.log('🔧 Validador QR:', typeof QRCodeValidator !== 'undefined' ? 'Disponível' : 'Não encontrado');
-    
-    if (fidelixSystem && fidelixSystem.qrValidator) {
-        console.log('✅ Validador inicializado com', fidelixSystem.qrValidator.lojas.length, 'lojas');
-    } else {
-        console.log('❌ Validador não inicializado');
-    }
-    
-    // Verificar estado atual do sistema
-    if (fidelixSystem) {
-        console.log('🔍 Estado atual do sistema:');
-        console.log('  - Compras no sistema:', fidelixSystem.compras.length);
-        console.log('  - Compras no localStorage:', compras.length);
-        console.log('  - Dashboard carregado:', !!document.getElementById('ultimasCompras'));
-    }
-    
-    // Mostrar modal com informações
-    const mensagem = `
-        <strong>Status do Sistema:</strong><br><br>
-        🏪 Lojas: ${lojas.length}<br>
-        🛒 Compras: ${compras.length}<br>
-        🎫 Cupons: ${cupons.length}<br>
-        📚 Histórico: ${historico.length}<br>
-        🔧 Validador QR: ${typeof QRCodeValidator !== 'undefined' ? '✅ Disponível' : '❌ Não encontrado'}<br><br>
-        <strong>Lojas Cadastradas:</strong><br>
-        ${lojas.map(l => `• ${l.nome}`).join('<br>') || 'Nenhuma loja cadastrada'}<br><br>
-        <strong>Últimas Compras:</strong><br>
-        ${compras.slice(-3).map(c => `• ${c.lojaId} - R$ ${c.valor} - ${c.data}`).join('<br>') || 'Nenhuma compra'}
-    `;
-    
-    fidelixSystem.mostrarModal('Debug do Sistema', mensagem);
-}
 
-// Testar validação de QR Code (função global)
-function testarQR(codigo) {
-    if (fidelixSystem) {
-        fidelixSystem.testarValidacaoQR(codigo);
-    } else {
-        console.error('❌ Sistema não inicializado');
-    }
-}
+
+
 
 // Fechar modais ao clicar fora
 window.onclick = function(event) {

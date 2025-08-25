@@ -1,27 +1,30 @@
-# 🎫 Fidelix - Sistema de Fidelidade
+# Fidelix - Sistema de Fidelidade Inteligente
 
-Um sistema completo de tickets de fidelidade desenvolvido em HTML, CSS e JavaScript puro, com interface moderna e funcionalidades avançadas.
+## 📋 Descrição
 
-## ✨ Funcionalidades
+O Fidelix é um sistema completo de fidelidade que permite aos usuários acumular compras e desbloquear cupons de desconto, enquanto oferece às empresas um portal dedicado para gerenciar seus próprios cupons de desconto.
 
-### 🔐 Sistema de Autenticação
-- **Cadastro de usuários** com validação completa
-- **Login seguro** com verificação de credenciais
-- **Sessões persistentes** usando localStorage
-- **Validação de campos** em tempo real
+## 🚀 Funcionalidades
 
-### 🛒 Validação de Compras
-- **QR Code** para compras em lojas físicas
-- **Código manual** para compras online
-- **Validação automática** de compras
-- **Histórico completo** de todas as transações
+### Para Usuários
+- ✅ Sistema de login e cadastro
+- ✅ Validação de compras via QR Code ou código manual
+- ✅ Histórico de compras e cupons
+- ✅ Dashboard com estatísticas e progresso
+- ✅ Sistema de cupons automático baseado em compras
+- ✅ Cupons empresariais personalizados
+- ✅ Edição de perfil e dados pessoais
 
-### 🎁 Sistema de Cupons
-- **Cupons automáticos** baseados no número de compras
-- **Descontos personalizáveis** por loja
-- **Validade configurável** (dias/meses)
-- **Gestão de cupons** utilizados e disponíveis
+### Para Empresas
+- ✅ Portal empresarial dedicado
+- ✅ Login e cadastro com validação de CNPJ
+- ✅ Criação, edição e exclusão de cupons
+- ✅ Configuração de compras necessárias para desbloquear cupons
+- ✅ Dashboard com estatísticas da empresa
+- ✅ Gerenciamento completo de cupons de desconto
+- ✅ Edição de perfil empresarial e alteração de senha
 
+<<<<<<< HEAD
 ### 📊 Dashboard Completo
 - **Estatísticas em tempo real** (compras, cupons, lojas)
 - **Atividades recentes** com timeline
@@ -81,73 +84,132 @@ Um sistema completo de tickets de fidelidade desenvolvido em HTML, CSS e JavaScr
 - **Tipografia clara** e legível
 
 ## 📋 Funcionalidades Técnicas
+=======
+## 🏗️ Estrutura do Projeto
 
-### Sistema de Dados
-- **Persistência local** usando localStorage
-- **Estrutura de dados** otimizada
-- **Validação de integridade** dos dados
-- **Backup automático** das informações
+```
+Projeto Pessoal/
+├── index.html                 # Página de login principal
+├── empresa-login.html         # Página de login empresarial
+├── empresa-dashboard.html     # Dashboard empresarial
+├── perfil-usuario.html        # Página de edição de perfil do usuário
+├── perfil-empresa.html        # Página de edição de perfil da empresa
+├── home.html                  # Dashboard do usuário
+├── cadastro.html              # Página de cadastro
+├── config.js                  # Configurações do sistema
+├── css/
+│   ├── home.css              # Estilos do dashboard
+│   ├── loginCadastro.css     # Estilos de login/cadastro
+│   └── style.css             # Estilos gerais
+├── js/
+│   ├── home.js               # Lógica principal do sistema
+│   ├── empresa-login.js      # Lógica de login empresarial
+│   ├── empresa-dashboard.js  # Lógica do dashboard empresarial
+│   ├── perfil-usuario.js     # Lógica de edição de perfil do usuário
+│   ├── perfil-empresa.js     # Lógica de edição de perfil da empresa
+│   ├── loginCadastro.js      # Lógica de login/cadastro
+│   ├── compras.js            # Lógica de compras
+│   └── qr-validator.js       # Validador de QR Code
+└── README.md                 # Documentação
+```
 
-### Segurança
-- **Validação de entrada** em todos os campos
-- **Sanitização de dados** antes do processamento
-- **Verificação de sessão** em todas as páginas
-- **Proteção contra** manipulação de dados
+## 🎯 Como Usar
+>>>>>>> 8d8d7cc (Adição de cadastro e login de empresa e edição de cupons)
 
-### Performance
-- **Lazy loading** de componentes
-- **Otimização de renderização** DOM
-- **Cache inteligente** de dados
-- **Debounce** em operações frequentes
+### Para Usuários
 
-## 🚀 Instalação e Execução
+1. **Acesso**: Acesse `index.html`
+2. **Cadastro**: Crie uma conta ou faça login
+3. **Dashboard**: Visualize seu progresso e cupons disponíveis
+4. **Compras**: Valide compras via QR Code ou código manual
+5. **Cupons**: Use os cupons desbloqueados automaticamente
+6. **Perfil**: Edite suas informações pessoais através do botão "Meu Perfil"
 
-1. **Clone ou baixe** o projeto
-2. **Abra** qualquer arquivo HTML em um navegador moderno
-3. **Não é necessário** servidor web ou instalação adicional
-4. **Funciona offline** após o primeiro carregamento
+### Para Empresas
 
-## 🌟 Recursos Avançados
+1. **Acesso**: Clique em "Área Empresarial" na página inicial
+2. **Cadastro**: Registre sua empresa com CNPJ válido
+3. **Login**: Acesse o portal empresarial
+4. **Cupons**: Crie, edite e gerencie cupons de desconto
+5. **Configuração**: Defina quantas compras são necessárias
+6. **Perfil**: Edite as informações da empresa através do botão "Perfil da Empresa"
 
-### Sistema de Notificações
-- Mensagens de sucesso/erro em tempo real
-- Animações suaves de entrada/saída
-- Posicionamento inteligente na tela
+## 🔧 Tecnologias Utilizadas
 
-### Filtros e Busca
-- Filtros por loja e período
-- Busca em tempo real
-- Ordenação por múltiplos critérios
+- **HTML5**: Estrutura das páginas
+- **CSS3**: Estilização e responsividade
+- **JavaScript**: Lógica do sistema
+- **LocalStorage**: Armazenamento local de dados
+- **FontAwesome**: Ícones
+- **HTML5-QRCode**: Leitura de QR Codes
 
-### Responsividade Avançada
-- Breakpoints otimizados
-- Layout adaptativo
-- Touch gestures para mobile
+## 📊 Sistema de Cupons
 
-## 🔮 Futuras Implementações
+### Cupons Automáticos
+- Desbloqueados automaticamente após atingir número de compras
+- Configurados pelas empresas
+- Validade personalizada
+- Valor mínimo configurável
 
-- [ ] **API de QR Code** real com câmera
-- [ ] **Sincronização em nuvem** dos dados
-- [ ] **Sistema de notificações** push
-- [ ] **Relatórios avançados** e analytics
-- [ ] **Integração com APIs** de lojas
-- [ ] **Sistema de pontos** mais complexo
-- [ ] **Gamificação** com conquistas
+### Cupons Empresariais
+- Criados pelas empresas através do portal
+- Desconto personalizado (1% a 100%)
+- Validade em dias (1 a 365)
+- Compras necessárias configuráveis
+- Descrição e valor mínimo opcionais
 
-## 🤝 Contribuição
+## 🔐 Segurança
 
-Este é um projeto pessoal, mas sugestões e melhorias são bem-vindas!
+- Validação de CNPJ para empresas
+- Senhas com mínimo de 6 caracteres
+- Validação de e-mail
+- Sessões separadas para usuários e empresas
 
-## 📄 Licença
+## 📱 Responsividade
 
-Projeto pessoal para fins educacionais e de portfólio.
+O sistema é totalmente responsivo e funciona em:
+- Desktop
+- Tablet
+- Smartphone
 
-## 👨‍💻 Autor
+## 🚀 Como Executar
 
+1. Clone ou baixe o projeto
+2. Abra `index.html` em um navegador moderno
+3. Para empresas, acesse através do botão "Área Empresarial"
+
+## 📝 Notas de Desenvolvimento
+
+<<<<<<< HEAD
 Kauan Adryan (@kauanadryan)
 
 Desenvolvido como projeto pessoal para demonstrar habilidades em desenvolvimento web front-end.
+=======
+- Sistema baseado em localStorage (sem banco de dados)
+- Compatível com navegadores modernos
+- Interface intuitiva e moderna
+- Código modular e bem organizado
+
+## 🔄 Atualizações Recentes
+
+### v2.0 - Sistema Empresarial
+- ✅ Portal empresarial completo
+- ✅ Gerenciamento de cupons empresariais
+- ✅ Validação de CNPJ
+- ✅ Dashboard empresarial
+- ✅ Integração com sistema de compras
+
+### v1.0 - Sistema Básico
+- ✅ Sistema de login/cadastro
+- ✅ Validação de compras
+- ✅ Cupons automáticos
+- ✅ Dashboard do usuário
+
+## 📞 Suporte
+
+Para dúvidas ou sugestões, entre em contato através do sistema.
+>>>>>>> 8d8d7cc (Adição de cadastro e login de empresa e edição de cupons)
 
 ---
 
-**Fidelix** - Transformando fidelidade em experiência! 🎉
+**Fidelix** - Transformando a fidelidade em resultados! 🎯
