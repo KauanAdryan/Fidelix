@@ -149,14 +149,13 @@ Projeto Pessoal/
 - Desbloqueados automaticamente após atingir número de compras
 - Configurados pelas empresas
 - Validade personalizada
-- Valor mínimo configurável
 
 ### Cupons Empresariais
 - Criados pelas empresas através do portal
 - Desconto personalizado (1% a 100%)
 - Validade em dias (1 a 365)
 - Compras necessárias configuráveis
-- Descrição e valor mínimo opcionais
+- Descrição opcional
 
 ## 🔐 Segurança
 

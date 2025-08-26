@@ -387,9 +387,7 @@ class FidelixSystem {
             if (cupom.descricao) {
                 cupomInfo += `<div class="cupom-descricao">${cupom.descricao}</div>`;
             }
-            if (cupom.valorMinimo && cupom.valorMinimo > 0) {
-                cupomInfo += `<div class="cupom-valor-minimo">Mínimo: R$ ${cupom.valorMinimo.toFixed(2)}</div>`;
-            }
+
             
             return `
                 <div class="cupom-card ${empresa ? 'empresa-cupom' : ''}" onclick="fidelixSystem.usarCupom(${cupom.id})">
@@ -1077,7 +1075,7 @@ class FidelixSystem {
                             utilizado: false,
                             comprasNecessarias: cupomEmpresa.comprasNecessarias,
                             descricao: cupomEmpresa.descricao,
-                            valorMinimo: cupomEmpresa.valorMinimo
+
                         };
 
                         this.cupons.push(novoCupom);
