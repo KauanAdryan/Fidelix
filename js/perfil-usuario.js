@@ -46,8 +46,20 @@ function carregarDadosUsuario() {
     const cupons = JSON.parse(localStorage.getItem('cupons') || '[]');
     
     document.getElementById('dataCadastro').textContent = formatarData(usuario.dataCadastro);
-    document.getElementById('totalCompras').textContent = compras.filter(c => c.usuarioId === usuario.id).length;
-    document.getElementById('cuponsUtilizados').textContent = cupons.filter(c => c.usuarioId === usuario.id && c.utilizado).length;
+    // Fallback: se registros antigos não tiverem usuarioId, considerar todos
+    const possuiUsuarioIdEmCompras = compras.some(c => 'usuarioId' in c);
+    const possuiUsuarioIdEmCupons = cupons.some(c => 'usuarioId' in c);
+
+    const comprasUsuario = possuiUsuarioIdEmCompras
+        ? compras.filter(c => c.usuarioId === usuario.id)
+        : compras;
+
+    const cuponsUsuario = possuiUsuarioIdEmCupons
+        ? cupons.filter(c => c.usuarioId === usuario.id)
+        : cupons;
+
+    document.getElementById('totalCompras').textContent = comprasUsuario.length;
+    document.getElementById('cuponsUtilizados').textContent = cuponsUsuario.filter(c => c.utilizado).length;
 }
 
 function aplicarMascaras() {

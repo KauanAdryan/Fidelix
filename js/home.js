@@ -584,6 +584,7 @@ class FidelixSystem {
             const loja = this.lojas[Math.floor(Math.random() * this.lojas.length)];
             const compra = {
                 id: Date.now(),
+                usuarioId: this.usuario?.id,
                 lojaId: loja.id,
                 data: new Date().toISOString(),
                 tipo: 'Online',
@@ -944,6 +945,7 @@ class FidelixSystem {
         try {
             const compra = {
                 id: Date.now(),
+                usuarioId: this.usuario?.id,
                 lojaId: this.dadosCompraTemporaria.lojaId,
                 data: this.dadosCompraTemporaria.data,
                 tipo: this.dadosCompraTemporaria.tipo,
@@ -1069,6 +1071,7 @@ class FidelixSystem {
                     if (!cupomExistente) {
                         const novoCupom = {
                             id: Date.now(),
+                            usuarioId: this.usuario?.id,
                             lojaId: lojaId,
                             empresaId: empresa.id,
                             desconto: cupomEmpresa.desconto,
@@ -1103,6 +1106,7 @@ class FidelixSystem {
                     if (!cupomExistente) {
                         const novoCupom = {
                             id: Date.now(),
+                            usuarioId: this.usuario?.id,
                             lojaId: lojaId,
                             desconto: cupomConfig.desconto,
                             dataCriacao: new Date().toISOString(),
