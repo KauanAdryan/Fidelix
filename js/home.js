@@ -1310,6 +1310,12 @@ function rejeitarCompraQR() {
     fidelixSystem.rejeitarCompraQR();
 }
 
+// Função para testar QR codes
+function testarQR(nomeEmpresa) {
+    console.log('🧪 Testando QR code com empresa:', nomeEmpresa);
+    fidelixSystem.testarValidacaoQR(nomeEmpresa);
+}
+
 // Logout
 function logout() {
     localStorage.removeItem('usuarioLogado');
