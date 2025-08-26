@@ -24,23 +24,13 @@
     
                  <!-- Botão para login empresarial -->
              <div style="margin-top: 20px; text-align: center;">
-               <button type="button" onclick="window.location.href='empresa-login.html'" style="background: #667eea; color: white; font-size: 0.9rem; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-right: 10px;">
+               <button type="button" onclick="window.location.href='empresa-login.html'" style="background: #667eea; color: white; font-size: 0.9rem; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
                  <i class="fas fa-building"></i> Área Empresarial
-               </button>
-               <button type="button" onclick="limparSessao()" style="background: #6c757d; font-size: 0.9rem; padding: 8px 16px;">
-                 Limpar Sessão
                </button>
              </div>
   </div>
 
   <script src="js/loginCadastro.js"></script>
-  <script>
-    function limparSessao() {
-      localStorage.removeItem('usuarioLogado');
-      localStorage.removeItem('historico');
-      alert('Sessão limpa! Recarregue a página.');
-      location.reload();
-    }
-  </script>
+
 </body>
 </html>
