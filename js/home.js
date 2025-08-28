@@ -346,6 +346,7 @@ class FidelixSystem {
         this.carregarUltimasCompras();
         this.carregarCuponsDisponiveis();
         this.carregarCuponsUtilizados();
+        this.popularFiltroLojas();
         this.carregarHistoricoCompras();
         this.carregarHistoricoCupons();
         this.carregarProgressoLojas();
@@ -658,6 +659,22 @@ class FidelixSystem {
                 </div>
             `;
         }).join('');
+    }
+
+    // Popular opções do filtro de lojas
+    popularFiltroLojas() {
+        const selectLojas = document.getElementById('filtroLoja');
+        if (!selectLojas) return;
+
+        const valorSelecionado = selectLojas.value;
+        const opcoes = ['<option value="">Todas as Lojas</option>']
+            .concat(this.lojas.map(loja => `<option value="${loja.id}">${loja.nome}</option>`))
+            .join('');
+        selectLojas.innerHTML = opcoes;
+
+        if (valorSelecionado && Array.from(selectLojas.options).some(o => o.value === valorSelecionado)) {
+            selectLojas.value = valorSelecionado;
+        }
     }
 
     // Filtrar histórico
