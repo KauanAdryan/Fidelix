@@ -1057,16 +1057,17 @@ class FidelixSystem {
         
         if (empresa && empresa.cupons) {
             empresa.cupons.forEach(cupomEmpresa => {
-                if (comprasLoja >= cupomEmpresa.comprasNecessarias) {
-                    // Verificar se já existe um cupom não utilizado
-                    const cupomExistente = this.cupons.find(c => 
+                // Concede o cupom somente no exato momento em que a meta é atingida
+                if (comprasLoja === cupomEmpresa.comprasNecessarias) {
+                    // Evitar duplicatas (mesmo se o usuário já tiver utilizado um anterior)
+                    const jaGerado = this.cupons.some(c => 
                         c.lojaId === lojaId && 
                         c.desconto === cupomEmpresa.desconto && 
-                        !c.utilizado &&
+                        c.comprasNecessarias === cupomEmpresa.comprasNecessarias &&
                         c.empresaId === empresa.id
                     );
 
-                    if (!cupomExistente) {
+                    if (!jaGerado) {
                         const novoCupom = {
                             id: Date.now(),
                             lojaId: lojaId,
@@ -1091,16 +1092,17 @@ class FidelixSystem {
         // Verificar cupons padrão da loja (mantendo compatibilidade)
         if (loja.cupons) {
             loja.cupons.forEach(cupomConfig => {
-                if (comprasLoja >= cupomConfig.comprasNecessarias) {
-                    // Verificar se já existe um cupom não utilizado
-                    const cupomExistente = this.cupons.find(c => 
+                // Concede o cupom somente quando atingir exatamente a meta
+                if (comprasLoja === cupomConfig.comprasNecessarias) {
+                    // Evitar duplicatas considerando a meta atingida
+                    const jaGerado = this.cupons.some(c => 
                         c.lojaId === lojaId && 
                         c.desconto === cupomConfig.desconto && 
-                        !c.utilizado &&
+                        c.comprasNecessarias === cupomConfig.comprasNecessarias &&
                         !c.empresaId // Cupons padrão não têm empresaId
                     );
 
-                    if (!cupomExistente) {
+                    if (!jaGerado) {
                         const novoCupom = {
                             id: Date.now(),
                             lojaId: lojaId,
