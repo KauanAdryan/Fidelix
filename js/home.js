@@ -59,9 +59,10 @@ class FidelixSystem {
         
         console.log('🏪 Lojas disponíveis:', this.lojas.map(l => l.nome));
         
-        // Atualizar validador de QR Code com as lojas
+        // Atualizar validador de QR Code com as lojas (se já estiver inicializado)
         if (this.qrValidator) {
             this.qrValidator.setLojas(this.lojas);
+            console.log('✅ Lojas atualizadas no validador existente:', this.lojas.length);
         }
     }
 
@@ -140,6 +141,12 @@ class FidelixSystem {
         } else {
             console.warn('⚠️ QRCodeValidator não encontrado. Usando validação básica.');
         }
+        
+        // Garantir que o validador tenha acesso às lojas
+        if (this.qrValidator && this.lojas.length > 0) {
+            this.qrValidator.setLojas(this.lojas);
+            console.log('✅ Lojas atualizadas no validador:', this.lojas.length);
+        }
     }
 
     // Criar lojas de exemplo
@@ -215,6 +222,13 @@ class FidelixSystem {
             console.log('  - Lojas:', lojasSalvas.length);
             console.log('  - Histórico:', historicoSalvo.length);
             
+            // Verificar se os dados foram salvos corretamente
+            if (comprasSalvas.length !== this.compras.length) {
+                console.warn('⚠️ Diferença no número de compras detectada. Verificando...');
+                console.log('  - Compras locais:', this.compras.length);
+                console.log('  - Compras no localStorage:', comprasSalvas.length);
+            }
+            
         } catch (error) {
             console.error('❌ Erro ao salvar dados:', error);
         }
@@ -227,10 +241,104 @@ class FidelixSystem {
         document.getElementById('filtroPeriodo')?.addEventListener('change', () => this.filtrarHistorico());
     }
 
+    // Limpar cupons duplicados
+    limparCuponsDuplicados() {
+        const cuponsUnicos = [];
+        const cuponsProcessados = new Set();
+        
+        this.cupons.forEach(cupom => {
+            if (!cupom.utilizado) {
+                const chave = `${cupom.lojaId}-${cupom.desconto}-${cupom.empresaId || 'padrao'}`;
+                if (!cuponsProcessados.has(chave)) {
+                    cuponsProcessados.add(chave);
+                    cuponsUnicos.push(cupom);
+                }
+            } else {
+                // Cupons utilizados sempre são mantidos
+                cuponsUnicos.push(cupom);
+            }
+        });
+        
+        if (cuponsUnicos.length !== this.cupons.length) {
+            console.log(`🧹 Cupons duplicados removidos: ${this.cupons.length - cuponsUnicos.length}`);
+            this.cupons = cuponsUnicos;
+            this.salvarDados();
+        }
+    }
+
+    // Limpar cupons órfãos (cupons de empresas que não existem mais)
+    limparCuponsOrfaos() {
+        const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+        const cuponsValidos = this.cupons.filter(cupom => {
+            if (!cupom.empresaId) return true; // Cupons padrão sempre são válidos
+            
+            // Verificar se a empresa ainda existe
+            const empresaExiste = empresas.find(e => e.id === cupom.empresaId);
+            if (!empresaExiste) {
+                console.log(`🗑️ Cupom órfão removido: ${cupom.desconto}% OFF (empresa ${cupom.empresaId} não existe mais)`);
+                return false;
+            }
+            
+            // Verificar se o cupom ainda existe na empresa
+            const cupomEmpresaExiste = empresaExiste.cupons && 
+                empresaExiste.cupons.find(c => 
+                    c.desconto === cupom.desconto && 
+                    c.comprasNecessarias === cupom.comprasNecessarias
+                );
+            
+            if (!cupomEmpresaExiste) {
+                console.log(`🗑️ Cupom removido da empresa: ${cupom.desconto}% OFF`);
+                return false;
+            }
+            
+            return true;
+        });
+        
+        if (cuponsValidos.length !== this.cupons.length) {
+            console.log(`🧹 Cupons órfãos removidos: ${this.cupons.length - cuponsValidos.length}`);
+            this.cupons = cuponsValidos;
+            this.salvarDados();
+        }
+    }
+
+    // Sincronizar cupons com empresas (remover cupons excluídos)
+    sincronizarCuponsEmpresas() {
+        const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+        let cuponsRemovidos = 0;
+        
+        this.cupons = this.cupons.filter(cupom => {
+            if (!cupom.empresaId) return true; // Cupons padrão sempre são válidos
+            
+            const empresa = empresas.find(e => e.id === cupom.empresaId);
+            if (!empresa) return false; // Empresa não existe mais
+            
+            // Verificar se o cupom específico ainda existe na empresa
+            const cupomEmpresaExiste = empresa.cupons && 
+                empresa.cupons.find(c => 
+                    c.desconto === cupom.desconto && 
+                    c.comprasNecessarias === cupom.comprasNecessarias
+                );
+            
+            if (!cupomEmpresaExiste) {
+                cuponsRemovidos++;
+                console.log(`🔄 Cupom sincronizado: ${cupom.desconto}% OFF removido (não existe mais na empresa)`);
+                return false;
+            }
+            
+            return true;
+        });
+        
+        if (cuponsRemovidos > 0) {
+            console.log(`🔄 Sincronização: ${cuponsRemovidos} cupons removidos`);
+            this.salvarDados();
+        }
+    }
+
     // Carregar dashboard
     carregarDashboard() {
         console.log('🔄 Carregando dashboard...');
         console.log('📊 Estado atual - Compras:', this.compras.length);
+        console.log('📊 Estado atual - Lojas:', this.lojas.length);
         
         this.atualizarEstatisticas();
         this.carregarAtividadesRecentes();
@@ -242,6 +350,9 @@ class FidelixSystem {
         this.carregarHistoricoCupons();
         this.carregarProgressoLojas();
         this.carregarInfoLojas();
+        this.limparCuponsDuplicados(); // Chamar a função para limpar duplicados
+        this.limparCuponsOrfaos(); // Chamar a função para limpar cupons órfãos
+        this.sincronizarCuponsEmpresas(); // Chamar a função para sincronizar cupons
         
         console.log('✅ Dashboard carregado completamente');
     }
@@ -329,10 +440,21 @@ class FidelixSystem {
         console.log('🔄 Carregando últimas compras...');
         console.log('📊 Total de compras no sistema:', this.compras.length);
         console.log('📊 Compras:', this.compras);
+        console.log('📊 Tipo de compras:', typeof this.compras);
+        console.log('📊 É array?', Array.isArray(this.compras));
         
         const container = document.getElementById('ultimasCompras');
         if (!container) {
             console.error('❌ Container de últimas compras não encontrado');
+            return;
+        }
+        
+        // Verificar se há compras
+        if (!this.compras || this.compras.length === 0) {
+            container.innerHTML = '<p class="no-data">Nenhuma compra registrada</p>';
+            console.log('ℹ️ Nenhuma compra para exibir');
+            console.log('ℹ️ Compras é null/undefined?', this.compras === null || this.compras === undefined);
+            console.log('ℹ️ Compras é array vazio?', Array.isArray(this.compras) && this.compras.length === 0);
             return;
         }
         
@@ -341,16 +463,23 @@ class FidelixSystem {
             .slice(0, 5);
 
         console.log('📊 Últimas 5 compras ordenadas:', ultimasCompras);
+        console.log('📊 Compras antes da ordenação:', this.compras);
+        console.log('📊 Compras após ordenação:', ultimasCompras);
 
         if (ultimasCompras.length === 0) {
             container.innerHTML = '<p class="no-data">Nenhuma compra registrada</p>';
-            console.log('ℹ️ Nenhuma compra para exibir');
+            console.log('ℹ️ Nenhuma compra para exibir após ordenação');
+            console.log('ℹ️ Compras originais:', this.compras);
+            console.log('ℹ️ Compras ordenadas:', ultimasCompras);
             return;
         }
 
         const htmlCompras = ultimasCompras.map(compra => {
             const loja = this.lojas.find(l => l.id === compra.lojaId);
             console.log('🔍 Compra:', compra, 'Loja encontrada:', loja);
+            console.log('🔍 LojaId da compra:', compra.lojaId);
+            console.log('🔍 Lojas disponíveis:', this.lojas.map(l => ({ id: l.id, nome: l.nome })));
+            console.log('🔍 Compra completa:', JSON.stringify(compra));
             
             return `
                 <div class="historico-item">
@@ -366,6 +495,17 @@ class FidelixSystem {
         container.innerHTML = htmlCompras;
         console.log('✅ Últimas compras carregadas com sucesso');
         console.log('🔍 HTML gerado:', htmlCompras);
+        console.log('🔍 Container atualizado:', container.innerHTML);
+        console.log('🔍 Container encontrado:', container);
+        console.log('🔍 Container ID:', container.id);
+        console.log('🔍 Container class:', container.className);
+        
+        // Teste adicional para verificar se o conteúdo está visível
+        console.log('🔍 Container display style:', window.getComputedStyle(container).display);
+        console.log('🔍 Container visibility:', window.getComputedStyle(container).visibility);
+        console.log('🔍 Container opacity:', window.getComputedStyle(container).opacity);
+        console.log('🔍 Container height:', window.getComputedStyle(container).height);
+        console.log('🔍 Container overflow:', window.getComputedStyle(container).overflow);
     }
 
     // Carregar cupons disponíveis
@@ -387,9 +527,7 @@ class FidelixSystem {
             if (cupom.descricao) {
                 cupomInfo += `<div class="cupom-descricao">${cupom.descricao}</div>`;
             }
-            if (cupom.valorMinimo && cupom.valorMinimo > 0) {
-                cupomInfo += `<div class="cupom-valor-minimo">Mínimo: R$ ${cupom.valorMinimo.toFixed(2)}</div>`;
-            }
+
             
             return `
                 <div class="cupom-card ${empresa ? 'empresa-cupom' : ''}" onclick="fidelixSystem.usarCupom(${cupom.id})">
@@ -584,6 +722,7 @@ class FidelixSystem {
             const loja = this.lojas[Math.floor(Math.random() * this.lojas.length)];
             const compra = {
                 id: Date.now(),
+                usuarioId: this.usuario?.id,
                 lojaId: loja.id,
                 data: new Date().toISOString(),
                 tipo: 'Online',
@@ -895,21 +1034,143 @@ class FidelixSystem {
         return (Math.random() * (valores.max - valores.min) + valores.min).toFixed(2);
     }
 
-    // Mostrar resultado do QR Code
-    mostrarResultadoQR(dadosCompra) {
-        console.log('🔍 Mostrando resultado QR:', dadosCompra);
+// Mostrar resultado do QR Code - FUNÇÃO ATUALIZADA
+mostrarResultadoQR(dadosCompra) {
+    console.log('🔍 Mostrando resultado QR:', dadosCompra);
+    
+    // Processar a compra automaticamente
+    console.log('🔄 Processando compra automaticamente...');
+    
+    try {
+        console.log('🔍 Iniciando criação da compra...');
+        const compra = {
+            id: Date.now(),
+            usuarioId: this.usuario?.id,
+            lojaId: dadosCompra.lojaId,
+            data: dadosCompra.data,
+            tipo: dadosCompra.tipo,
+            valor: dadosCompra.valor,
+            codigo: dadosCompra.codigo
+        };
+
+        console.log('✅ Compra criada:', compra);
+        console.log('🔍 Compras antes da adição:', this.compras.length);
+
+        // Adicionar compra ao array
+        console.log('🔍 Adicionando compra ao array...');
+        this.compras.push(compra);
+        console.log('📊 Total de compras após adição:', this.compras.length);
+        console.log('📊 Array de compras atualizado:', this.compras);
+
+        // Adicionar ao histórico
+        this.adicionarHistorico('Compra validada', 
+            `Compra de R$ ${compra.valor} na ${dadosCompra.loja}`, 'compra');
         
-        document.getElementById('qr-loja-nome').textContent = dadosCompra.loja;
-        document.getElementById('qr-codigo').textContent = dadosCompra.codigo;
-        document.getElementById('qr-valor').textContent = `R$ ${dadosCompra.valor}`;
+        // Verificar cupons
+        this.verificarCupons(compra.lojaId);
         
-        document.getElementById('qr-result').style.display = 'block';
-        document.getElementById('qr-result').classList.add('qr-success');
+        // Salvar dados
+        console.log('🔍 Salvando dados...');
+        this.salvarDados();
+        console.log('💾 Dados salvos no localStorage');
         
-        // Armazenar dados temporariamente
-        this.dadosCompraTemporaria = dadosCompra;
-        console.log('💾 Dados temporários armazenados:', this.dadosCompraTemporaria);
+        // Verificar se foi salvo corretamente
+        const comprasSalvas = JSON.parse(localStorage.getItem('compras') || '[]');
+        console.log('🔍 Verificação - Compras no localStorage após salvar:', comprasSalvas.length);
+        console.log('🔍 Compras salvas:', comprasSalvas);
+        
+        // Recarregar dashboard
+        console.log('🔍 Recarregando dashboard...');
+        this.carregarDashboard();
+        console.log('🔄 Dashboard recarregado');
+
+        // Mostrar sucesso
+        this.mostrarModalSucesso('Sucesso!', 
+            `Compra validada automaticamente na ${dadosCompra.loja} no valor de R$ ${dadosCompra.valor}!`);
+        
+        // Limpar interface
+        this.ocultarResultadoQR();
+        this.atualizarInterfaceQR(false);
+        
+        console.log('✅ Compra processada automaticamente com sucesso!');
+        
+    } catch (error) {
+        console.error('❌ Erro ao processar compra:', error);
+        this.mostrarModal('Erro', 'Erro ao processar compra. Tente novamente.');
     }
+}
+
+// Adicione esta função para melhorar a inicialização da câmera
+async iniciarLeituraQR() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        this.mostrarModal('Erro', 'Câmera não suportada neste dispositivo.');
+        return;
+    }
+
+    try {
+        console.log('🔧 Iniciando leitura de QR Code...');
+        
+        // Verificar se HTML5-QRCode está disponível
+        if (typeof Html5Qrcode === 'undefined') {
+            console.error('❌ HTML5-QRCode não está disponível');
+            this.mostrarModal('Erro', 'Biblioteca de leitura QR não carregada. Recarregue a página.');
+            return;
+        }
+        
+        // Limpar container e garantir que está vazio
+        const container = document.querySelector('#qr-interactive');
+        container.innerHTML = '';
+        
+        // Adicionar elemento de status
+        const statusDiv = document.createElement('div');
+        statusDiv.id = 'qr-status';
+        statusDiv.className = 'qr-status';
+        statusDiv.innerHTML = '<i class="fas fa-camera"></i><p>Posicione o QR Code da loja na área da câmera</p>';
+        container.appendChild(statusDiv);
+        
+        // Criar instância do HTML5-QRCode
+        this.html5QrCode = new Html5Qrcode("qr-interactive");
+        
+        console.log('📱 Configurando câmera...');
+        
+        // Configurações da câmera
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
+        };
+        
+        // Iniciar leitura
+        await this.html5QrCode.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText, decodedResult) => {
+                console.log('🔍 QR Code detectado:', decodedText);
+                // Parar a leitura automaticamente após detectar
+                this.pararLeituraQR();
+                // Processar o QR Code detectado
+                this.processarQRCodeDetectado(decodedText);
+            },
+            (errorMessage) => {
+                // Erro de decodificação é normal, não mostrar
+                if (!errorMessage.includes("No multi format")) {
+                    console.log('Procurando QR Code...');
+                }
+            }
+        );
+        
+        console.log('✅ Câmera inicializada com sucesso');
+        this.atualizarInterfaceQR(true);
+        this.leituraAtiva = true;
+        
+    } catch (error) {
+        console.error('❌ Erro ao inicializar câmera:', error);
+        this.mostrarModal('Erro', 'Erro ao acessar a câmera. Verifique as permissões.');
+        
+        // Restaurar interface em caso de erro
+        this.atualizarInterfaceQR(false);
+    }
+}
 
     // Mostrar erro de validação do QR Code
     mostrarErroQRCode(mensagem) {
@@ -934,6 +1195,7 @@ class FidelixSystem {
     confirmarCompraQR() {
         console.log('🔄 Confirmando compra QR...');
         console.log('🔍 Dados temporários:', this.dadosCompraTemporaria);
+        console.log('🔍 Função confirmarCompraQR chamada!');
         
         if (!this.dadosCompraTemporaria) {
             console.error('❌ Dados da compra não encontrados');
@@ -942,8 +1204,10 @@ class FidelixSystem {
         }
 
         try {
+            console.log('🔍 Iniciando criação da compra...');
             const compra = {
                 id: Date.now(),
+                usuarioId: this.usuario?.id,
                 lojaId: this.dadosCompraTemporaria.lojaId,
                 data: this.dadosCompraTemporaria.data,
                 tipo: this.dadosCompraTemporaria.tipo,
@@ -954,6 +1218,7 @@ class FidelixSystem {
             console.log('✅ Compra criada:', compra);
 
             // Adicionar compra ao array
+            console.log('🔍 Adicionando compra ao array...');
             this.compras.push(compra);
             console.log('📊 Total de compras após adição:', this.compras.length);
             console.log('📊 Array de compras atualizado:', this.compras);
@@ -973,7 +1238,7 @@ class FidelixSystem {
             const comprasSalvas = JSON.parse(localStorage.getItem('compras') || '[]');
             console.log('🔍 Verificação - Compras no localStorage após salvar:', comprasSalvas.length);
             
-            // Recarregar dashboard DEPOIS de salvar
+            // Recarregar dashboard diretamente (os dados já estão sincronizados)
             this.carregarDashboard();
             console.log('🔄 Dashboard recarregado');
 
@@ -1057,18 +1322,20 @@ class FidelixSystem {
         
         if (empresa && empresa.cupons) {
             empresa.cupons.forEach(cupomEmpresa => {
-                if (comprasLoja >= cupomEmpresa.comprasNecessarias) {
-                    // Verificar se já existe um cupom não utilizado
-                    const cupomExistente = this.cupons.find(c => 
+                // Concede o cupom somente no exato momento em que a meta é atingida
+                if (comprasLoja === cupomEmpresa.comprasNecessarias) {
+                    // Evitar duplicatas (mesmo se o usuário já tiver utilizado um anterior)
+                    const jaGerado = this.cupons.some(c => 
                         c.lojaId === lojaId && 
                         c.desconto === cupomEmpresa.desconto && 
-                        !c.utilizado &&
+                        c.comprasNecessarias === cupomEmpresa.comprasNecessarias &&
                         c.empresaId === empresa.id
                     );
 
-                    if (!cupomExistente) {
+                    if (!jaGerado) {
                         const novoCupom = {
                             id: Date.now(),
+                            usuarioId: this.usuario?.id,
                             lojaId: lojaId,
                             empresaId: empresa.id,
                             desconto: cupomEmpresa.desconto,
@@ -1077,7 +1344,7 @@ class FidelixSystem {
                             utilizado: false,
                             comprasNecessarias: cupomEmpresa.comprasNecessarias,
                             descricao: cupomEmpresa.descricao,
-                            valorMinimo: cupomEmpresa.valorMinimo
+
                         };
 
                         this.cupons.push(novoCupom);
@@ -1088,21 +1355,23 @@ class FidelixSystem {
             });
         }
         
-        // Verificar cupons padrão da loja (mantendo compatibilidade)
-        if (loja.cupons) {
+        // Verificar cupons padrão da loja APENAS se não houver cupons empresariais
+        if (loja.cupons && (!empresa || !empresa.cupons || empresa.cupons.length === 0)) {
             loja.cupons.forEach(cupomConfig => {
-                if (comprasLoja >= cupomConfig.comprasNecessarias) {
-                    // Verificar se já existe um cupom não utilizado
-                    const cupomExistente = this.cupons.find(c => 
+                // Concede o cupom somente quando atingir exatamente a meta
+                if (comprasLoja === cupomConfig.comprasNecessarias) {
+                    // Evitar duplicatas considerando a meta atingida
+                    const jaGerado = this.cupons.some(c => 
                         c.lojaId === lojaId && 
                         c.desconto === cupomConfig.desconto && 
-                        !c.utilizado &&
+                        c.comprasNecessarias === cupomConfig.comprasNecessarias &&
                         !c.empresaId // Cupons padrão não têm empresaId
                     );
 
-                    if (!cupomExistente) {
+                    if (!jaGerado) {
                         const novoCupom = {
                             id: Date.now(),
+                            usuarioId: this.usuario?.id,
                             lojaId: lojaId,
                             desconto: cupomConfig.desconto,
                             dataCriacao: new Date().toISOString(),
@@ -1308,6 +1577,12 @@ function confirmarCompraQR() {
 
 function rejeitarCompraQR() {
     fidelixSystem.rejeitarCompraQR();
+}
+
+// Função para testar QR codes
+function testarQR(nomeEmpresa) {
+    console.log('🧪 Testando QR code com empresa:', nomeEmpresa);
+    fidelixSystem.testarValidacaoQR(nomeEmpresa);
 }
 
 // Logout

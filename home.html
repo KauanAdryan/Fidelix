@@ -10,6 +10,25 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 </head>
+<script>
+  // Adicionar polyfill para melhor compatibilidade da câmera
+  (function() {
+    if (!navigator.mediaDevices) {
+      navigator.mediaDevices = {};
+    }
+    if (!navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia = function(constraints) {
+        var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        if (!getUserMedia) {
+          return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+        }
+        return new Promise(function(resolve, reject) {
+          getUserMedia.call(navigator, constraints, resolve, reject);
+        });
+      };
+    }
+  })();
+</script>
 <body>
   <div class="container">
     <!-- Header -->
@@ -19,7 +38,7 @@
       </div>
       <div class="user-info">
         <span id="userWelcome"></span>
-        <button onclick="window.location.href='perfil-usuario.html'" class="perfil-btn" style="background: #28a745; margin-right: 10px;">
+        <button onclick="window.location.href='perfil-usuario.html'" class="perfil-btn">
           <i class="fas fa-user-edit"></i> Meu Perfil
         </button>
         <button onclick="logout()" class="logout-btn">
@@ -90,17 +109,10 @@
         <div class="card">
           <h3><i class="fas fa-qrcode"></i> Validar Compra</h3>
           
-          <div class="validation-tabs">
-            <button class="validation-tab active" onclick="showValidationTab('qr')">
-              <i class="fas fa-qrcode"></i> QR Code
-            </button>
-            <button class="validation-tab" onclick="showValidationTab('codigo')">
-              <i class="fas fa-keyboard"></i> Código Manual
-            </button>
-          </div>
+
 
           <!-- QR Code Validation -->
-          <div id="qr-validation" class="validation-content active">
+          <div id="qr-validation">
             <div class="qr-scanner">
               <div id="qr-reader" class="qr-reader">
                 <div id="qr-interactive" class="qr-interactive"></div>
@@ -165,15 +177,7 @@
             </div>
           </div>
 
-          <!-- Manual Code Validation -->
-          <div id="codigo-validation" class="validation-content">
-            <div class="manual-input">
-              <input type="text" id="codigoCompra" placeholder="Digite o código da compra" maxlength="10">
-              <button onclick="validarCodigoCompra()" class="validate-btn">
-                <i class="fas fa-check"></i> Validar Compra
-              </button>
-            </div>
-          </div>
+
         </div>
 
         <div class="card">

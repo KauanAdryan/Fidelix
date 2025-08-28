@@ -3,7 +3,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     verificarLogin();
     carregarDadosUsuario();
-    aplicarMascaras();
     
     const perfilForm = document.getElementById('perfilForm');
     if (perfilForm) {
@@ -34,101 +33,42 @@ function carregarDadosUsuario() {
     // Preencher formulário
     document.getElementById('nome').value = usuario.nome || '';
     document.getElementById('email').value = usuario.email || '';
-    document.getElementById('telefone').value = usuario.telefone || '';
-    document.getElementById('cpf').value = usuario.cpf || '';
-    document.getElementById('endereco').value = usuario.endereco || '';
-    document.getElementById('cidade').value = usuario.cidade || '';
-    document.getElementById('estado').value = usuario.estado || '';
-    document.getElementById('cep').value = usuario.cep || '';
     
     // Carregar informações da conta
     const compras = JSON.parse(localStorage.getItem('compras') || '[]');
     const cupons = JSON.parse(localStorage.getItem('cupons') || '[]');
     
     document.getElementById('dataCadastro').textContent = formatarData(usuario.dataCadastro);
-    document.getElementById('totalCompras').textContent = compras.filter(c => c.usuarioId === usuario.id).length;
-    document.getElementById('cuponsUtilizados').textContent = cupons.filter(c => c.usuarioId === usuario.id && c.utilizado).length;
+    // Fallback: se registros antigos não tiverem usuarioId, considerar todos
+    const possuiUsuarioIdEmCompras = compras.some(c => 'usuarioId' in c);
+    const possuiUsuarioIdEmCupons = cupons.some(c => 'usuarioId' in c);
+
+    const comprasUsuario = possuiUsuarioIdEmCompras
+        ? compras.filter(c => c.usuarioId === usuario.id)
+        : compras;
+
+    const cuponsUsuario = possuiUsuarioIdEmCupons
+        ? cupons.filter(c => c.usuarioId === usuario.id)
+        : cupons;
+
+    document.getElementById('totalCompras').textContent = comprasUsuario.length;
+    document.getElementById('cuponsUtilizados').textContent = cuponsUsuario.filter(c => c.utilizado).length;
 }
 
-function aplicarMascaras() {
-    // Máscara de CPF
-    const cpfInput = document.getElementById('cpf');
-    if (cpfInput) {
-        cpfInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-                value = value.replace(/\.(\d{3})(\d)/, '.$1-$2');
-                e.target.value = value;
-            }
-        });
-    }
-    
-    // Máscara de telefone
-    const telefoneInput = document.getElementById('telefone');
-    if (telefoneInput) {
-        telefoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                if (value.length <= 10) {
-                    value = value.replace(/^(\d{2})(\d)/, '($1) $2');
-                    value = value.replace(/(\d{4})(\d)/, '$1-$2');
-                } else {
-                    value = value.replace(/^(\d{2})(\d)/, '($1) $2');
-                    value = value.replace(/(\d{5})(\d)/, '$1-$2');
-                }
-                e.target.value = value;
-            }
-        });
-    }
-    
-    // Máscara de CEP
-    const cepInput = document.getElementById('cep');
-    if (cepInput) {
-        cepInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 8) {
-                value = value.replace(/^(\d{5})(\d)/, '$1-$2');
-                e.target.value = value;
-            }
-        });
-    }
-}
+
 
 function salvarPerfil() {
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
-    const endereco = document.getElementById('endereco').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    const estado = document.getElementById('estado').value.trim();
-    const cep = document.getElementById('cep').value.replace(/\D/g, '');
     
     // Validações
-    if (!nome || !email || !telefone || !cpf || !endereco || !cidade || !estado || !cep) {
+    if (!nome || !email) {
         mostrarMensagem('Por favor, preencha todos os campos obrigatórios.', 'error');
         return;
     }
     
     if (nome.length < 3) {
         mostrarMensagem('O nome deve ter pelo menos 3 caracteres.', 'error');
-        return;
-    }
-    
-    if (cpf.length !== 11) {
-        mostrarMensagem('CPF deve ter 11 dígitos.', 'error');
-        return;
-    }
-    
-    if (!validarCPF(cpf)) {
-        mostrarMensagem('CPF inválido.', 'error');
-        return;
-    }
-    
-    if (cep.length !== 8) {
-        mostrarMensagem('CEP deve ter 8 dígitos.', 'error');
         return;
     }
     
@@ -156,12 +96,6 @@ function salvarPerfil() {
             ...usuarios[usuarioIndex],
             nome: nome,
             email: email,
-            telefone: telefone,
-            cpf: cpf,
-            endereco: endereco,
-            cidade: cidade,
-            estado: estado,
-            cep: cep,
             dataAtualizacao: new Date().toISOString()
         };
         
@@ -198,39 +132,7 @@ function salvarPerfil() {
     }
 }
 
-function validarCPF(cpf) {
-    // Remove caracteres não numéricos
-    cpf = cpf.replace(/[^\d]/g, '');
-    
-    // Verifica se tem 11 dígitos
-    if (cpf.length !== 11) return false;
-    
-    // Verifica se todos os dígitos são iguais
-    if (/^(\d)\1+$/.test(cpf)) return false;
-    
-    // Validação dos dígitos verificadores
-    let soma = 0;
-    let resto;
-    
-    for (let i = 1; i <= 9; i++) {
-        soma = soma + parseInt(cpf.substring(i - 1, i)) * (11 - i);
-    }
-    
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(9, 10))) return false;
-    
-    soma = 0;
-    for (let i = 1; i <= 10; i++) {
-        soma = soma + parseInt(cpf.substring(i - 1, i)) * (12 - i);
-    }
-    
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(10, 11))) return false;
-    
-    return true;
-}
+
 
 function formatarData(dataString) {
     const data = new Date(dataString);

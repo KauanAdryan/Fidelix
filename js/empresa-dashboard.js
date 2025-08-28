@@ -83,7 +83,6 @@ function carregarCuponsEmpresa() {
                     <p><strong>Validade:</strong> ${cupom.validade} dias</p>
                     <p><strong>Compras necessárias:</strong> ${cupom.comprasNecessarias}</p>
                     ${cupom.descricao ? `<p><strong>Descrição:</strong> ${cupom.descricao}</p>` : ''}
-                    ${cupom.valorMinimo ? `<p><strong>Valor mínimo:</strong> R$ ${cupom.valorMinimo.toFixed(2)}</p>` : ''}
                     <p><strong>Criado em:</strong> ${formatarData(cupom.dataCriacao)}</p>
                 </div>
             </div>
@@ -121,7 +120,6 @@ function criarCupom() {
     const validade = parseInt(document.getElementById('validade').value);
     const comprasNecessarias = parseInt(document.getElementById('comprasNecessariasCupom').value);
     const descricao = document.getElementById('descricao').value.trim();
-    const valorMinimo = parseFloat(document.getElementById('valorMinimo').value) || 0;
     
     if (!desconto || !validade || !comprasNecessarias) {
         mostrarMensagem('Por favor, preencha todos os campos obrigatórios.', 'error');
@@ -139,7 +137,6 @@ function criarCupom() {
         validade: validade,
         comprasNecessarias: comprasNecessarias,
         descricao: descricao,
-        valorMinimo: valorMinimo,
         dataCriacao: new Date().toISOString(),
         empresaId: empresaLogada.id
     };
@@ -201,7 +198,6 @@ function editarCupom(cupomId) {
     document.getElementById('editValidade').value = cupom.validade;
     document.getElementById('editComprasNecessarias').value = cupom.comprasNecessarias;
     document.getElementById('editDescricao').value = cupom.descricao || '';
-    document.getElementById('editValorMinimo').value = cupom.valorMinimo || '';
     
     // Mostrar modal
     document.getElementById('editModal').style.display = 'flex';
@@ -214,7 +210,6 @@ function salvarEdicaoCupom() {
     const validade = parseInt(document.getElementById('editValidade').value);
     const comprasNecessarias = parseInt(document.getElementById('editComprasNecessarias').value);
     const descricao = document.getElementById('editDescricao').value.trim();
-    const valorMinimo = parseFloat(document.getElementById('editValorMinimo').value) || 0;
     
     if (!desconto || !validade || !comprasNecessarias) {
         mostrarMensagem('Por favor, preencha todos os campos obrigatórios.', 'error');
@@ -235,7 +230,6 @@ function salvarEdicaoCupom() {
                 validade: validade,
                 comprasNecessarias: comprasNecessarias,
                 descricao: descricao,
-                valorMinimo: valorMinimo,
                 dataAtualizacao: new Date().toISOString()
             };
             
@@ -287,6 +281,20 @@ function excluirCupom(cupomId) {
                     const cupom = empresas[empresaIndex].cupons[cupomIndex];
                     empresas[empresaIndex].cupons.splice(cupomIndex, 1);
                     localStorage.setItem('empresas', JSON.stringify(empresas));
+
+                    // Remover cupom dos usuários que o possuem
+                    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+                    usuarios.forEach(usuario => {
+                        if (usuario.cupons) {
+                            // Remover cupons com mesmo desconto e empresaId
+                            usuario.cupons = usuario.cupons.filter(c => 
+                                !(c.empresaId === empresaLogada.id && 
+                                  c.desconto === cupom.desconto && 
+                                  c.lojaId === cupom.lojaId)
+                            );
+                        }
+                    });
+                    localStorage.setItem('usuarios', JSON.stringify(usuarios));
 
                     // Atualizar loja espelho
                     const lojas = JSON.parse(localStorage.getItem('lojas') || '[]');

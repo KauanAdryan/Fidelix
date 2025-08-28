@@ -268,7 +268,7 @@
       </div>
       <div class="user-info">
         <span id="empresaWelcome"></span>
-        <button onclick="window.location.href='perfil-empresa.html'" class="perfil-btn" style="background: #28a745; margin-right: 10px;">
+        <button onclick="window.location.href='perfil-empresa.html'" class="perfil-btn">
           <i class="fas fa-building"></i> Perfil da Empresa
         </button>
         <button onclick="logoutEmpresa()" class="logout-btn">
@@ -337,10 +337,6 @@
             <label for="descricao">Descrição do Cupom</label>
             <input type="text" id="descricao" placeholder="Ex: Desconto especial para clientes fiéis" maxlength="100">
           </div>
-          <div class="form-group">
-            <label for="valorMinimo">Valor Mínimo da Compra</label>
-            <input type="number" id="valorMinimo" placeholder="Ex: 50.00" min="0" step="0.01">
-          </div>
         </div>
         <div class="form-actions">
           <button type="button" onclick="limparFormulario()" class="btn-secondary">
@@ -401,10 +397,6 @@
           <div class="form-group">
             <label for="editDescricao">Descrição</label>
             <input type="text" id="editDescricao" maxlength="100">
-          </div>
-          <div class="form-group">
-            <label for="editValorMinimo">Valor Mínimo</label>
-            <input type="number" id="editValorMinimo" min="0" step="0.01">
           </div>
         </div>
         <div class="form-actions">

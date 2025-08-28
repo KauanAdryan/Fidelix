@@ -45,7 +45,7 @@ body {
 .user-info {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 #userWelcome {
@@ -53,20 +53,103 @@ body {
   color: #555;
 }
 
-.logout-btn {
-  background: #ff6b6b;
+/* Botão Meu Perfil - Design Moderno e Elegante */
+.perfil-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 25px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+  margin-right: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perfil-btn:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.perfil-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.perfil-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.perfil-btn:hover::before {
+  left: 100%;
+}
+
+.perfil-btn i {
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+/* Botão Sair - Design Moderno e Elegante */
+.logout-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .logout-btn:hover {
-  background: #ff5252;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #ff5252 0%, #e53935 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.logout-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.logout-btn:hover::before {
+  left: 100%;
+}
+
+.logout-btn i {
+  margin-right: 8px;
+  font-size: 0.9rem;
 }
 
 /* Navigation Tabs */
@@ -231,39 +314,7 @@ body {
   }
 }
 
-/* Validation Tabs */
-.validation-tabs {
-  display: flex;
-  margin-bottom: 20px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 10px;
-  padding: 5px;
-}
 
-.validation-tab {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  color: #666;
-  transition: all 0.3s ease;
-}
-
-.validation-tab.active {
-  background: #667eea;
-  color: white;
-}
-
-.validation-content {
-  display: none;
-}
-
-.validation-content.active {
-  display: block;
-}
 
 /* QR Scanner */
 .qr-scanner {
@@ -284,7 +335,7 @@ body {
 
 .qr-interactive {
   width: 100%;
-  height: 300px;
+  height: 400px;
   background: #000;
   position: relative;
 }
@@ -486,42 +537,7 @@ body {
   100% { transform: scale(1); }
 }
 
-/* Manual Input */
-.manual-input {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
 
-#codigoCompra {
-  flex: 1;
-  padding: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  transition: border-color 0.3s ease;
-}
-
-#codigoCompra:focus {
-  outline: none;
-  border-color: #667eea;
-}
-
-.validate-btn {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 15px 25px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.validate-btn:hover {
-  background: #218838;
-  transform: translateY(-2px);
-}
 
 /* Cupons Container */
 .cupons-container {
@@ -598,15 +614,7 @@ body {
   font-style: italic;
 }
 
-.cupom-valor-minimo {
-  font-size: 0.8rem;
-  margin-bottom: 8px;
-  opacity: 0.8;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 4px 8px;
-  border-radius: 4px;
-  display: inline-block;
-}
+
 
 /* Cupons List */
 .cupons-list {
@@ -922,10 +930,7 @@ body {
     flex-direction: column;
   }
   
-  .manual-input {
-    flex-direction: column;
-    align-items: stretch;
-  }
+
 }
 
 /* Animações */
@@ -965,4 +970,194 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #5a6fd8;
+}
+
+/* Adicione estas regras no final do arquivo CSS */
+
+/* Garantir que o resultado do QR seja visível */
+.qr-result {
+  display: none;
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-top: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 3px solid #28a745;
+  position: relative;
+  z-index: 1000;
+}
+
+.qr-result.qr-success {
+  display: block !important;
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from {
+      opacity: 0;
+      transform: translateY(30px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Garantir que o container do scanner não oculte o resultado */
+.qr-scanner {
+  position: relative;
+  z-index: 1;
+}
+
+.qr-reader {
+  position: relative;
+  z-index: 2;
+}
+
+/* Forçar visibilidade dos elementos do resultado */
+.result-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.result-header i {
+  font-size: 3rem;
+  color: #28a745;
+  margin-bottom: 10px;
+}
+
+.result-header h4 {
+  color: #333;
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.result-content {
+  margin-bottom: 25px;
+}
+
+.result-content p {
+  margin: 10px 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.result-content strong {
+  color: #333;
+}
+
+.result-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Garantir que os botões sejam visíveis */
+.btn-primary, .btn-secondary {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: #28a745;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* Correção para garantir que o elemento não esteja oculto por outros */
+#qr-validation {
+  position: relative;
+}
+
+#qr-reader {
+  position: relative;
+  z-index: 5;
+}
+
+/* Garantir que o resultado fique acima de tudo */
+.qr-result {
+  z-index: 1000 !important;
+  position: relative;
+}
+
+/* Correções para o resultado do QR Code */
+.qr-result {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-top: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 2px solid #28a745;
+  position: relative;
+  z-index: 100;
+}
+
+.qr-result.qr-success {
+  display: block !important;
+  animation: fadeIn 0.5s ease-in-out;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Garantir que a câmera não sobreponha o resultado */
+.qr-reader {
+  position: relative;
+  z-index: 10;
+}
+
+/* Melhorar visibilidade do status da câmera */
+.qr-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* Animações melhoradas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Melhorar responsividade do scanner */
+@media (max-width: 768px) {
+  .qr-reader {
+    height: 350px !important;
+  }
+  
+  .qr-interactive {
+    height: 350px !important;
+  }
 }

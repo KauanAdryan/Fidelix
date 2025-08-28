@@ -24,67 +24,6 @@ O Fidelix é um sistema completo de fidelidade que permite aos usuários acumula
 - ✅ Gerenciamento completo de cupons de desconto
 - ✅ Edição de perfil empresarial e alteração de senha
 
-<<<<<<< HEAD
-### 📊 Dashboard Completo
-- **Estatísticas em tempo real** (compras, cupons, lojas)
-- **Atividades recentes** com timeline
-- **Objetivos e progresso** por loja
-- **Filtros avançados** para histórico
-
-### 🏪 Gestão de Lojas
-- **Configuração de cupons** por estabelecimento
-- **Progresso visual** com barras animadas
-- **Informações detalhadas** de cada loja
-- **Sistema flexível** de regras de fidelidade
-
-## 🚀 Como Usar
-
-### 1. Primeiro Acesso
-1. Acesse `cadastro.html` para criar sua conta
-2. Preencha todos os campos obrigatórios
-3. Faça login em `index.html`
-4. Acesse o dashboard em `home.html`
-
-### 2. Validando Compras
-- **Lojas Físicas**: Use o QR Code fornecido pela loja
-- **Compras Online**: Digite o código recebido no campo manual
-
-### 3. Gerenciando Cupons
-- Visualize cupons disponíveis na aba "Cupons"
-- Clique em um cupom para utilizá-lo
-- Acompanhe o histórico na aba "Histórico"
-
-### 4. Acompanhando Progresso
-- Monitore seu progresso por loja na aba "Lojas"
-- Veja quantas compras faltam para o próximo cupom
-- Acompanhe estatísticas no dashboard principal
-
-## 🛠️ Tecnologias Utilizadas
-
-- **HTML5** - Estrutura semântica
-- **CSS3** - Estilos modernos com animações
-- **JavaScript ES6+** - Lógica de negócio
-- **Font Awesome** - Ícones vetoriais
-- **LocalStorage** - Persistência de dados
-- **CSS Grid & Flexbox** - Layout responsivo
-
-## 📱 Design Responsivo
-
-- **Mobile First** - Otimizado para dispositivos móveis
-- **Adaptativo** - Funciona em todos os tamanhos de tela
-- **Touch Friendly** - Interface otimizada para toque
-- **Performance** - Carregamento rápido e fluido
-
-## 🎨 Características Visuais
-
-- **Gradientes modernos** com cores vibrantes
-- **Glassmorphism** - Efeito de vidro translúcido
-- **Animações suaves** e transições elegantes
-- **Ícones intuitivos** para melhor UX
-- **Tipografia clara** e legível
-
-## 📋 Funcionalidades Técnicas
-=======
 ## 🏗️ Estrutura do Projeto
 
 ```
@@ -114,7 +53,6 @@ Projeto Pessoal/
 ```
 
 ## 🎯 Como Usar
->>>>>>> 8d8d7cc (Adição de cadastro e login de empresa e edição de cupons)
 
 ### Para Usuários
 
@@ -149,14 +87,13 @@ Projeto Pessoal/
 - Desbloqueados automaticamente após atingir número de compras
 - Configurados pelas empresas
 - Validade personalizada
-- Valor mínimo configurável
 
 ### Cupons Empresariais
 - Criados pelas empresas através do portal
 - Desconto personalizado (1% a 100%)
 - Validade em dias (1 a 365)
 - Compras necessárias configuráveis
-- Descrição e valor mínimo opcionais
+- Descrição opcional
 
 ## 🔐 Segurança
 
@@ -180,11 +117,6 @@ O sistema é totalmente responsivo e funciona em:
 
 ## 📝 Notas de Desenvolvimento
 
-<<<<<<< HEAD
-Kauan Adryan (@kauanadryan)
-
-Desenvolvido como projeto pessoal para demonstrar habilidades em desenvolvimento web front-end.
-=======
 - Sistema baseado em localStorage (sem banco de dados)
 - Compatível com navegadores modernos
 - Interface intuitiva e moderna
@@ -208,7 +140,6 @@ Desenvolvido como projeto pessoal para demonstrar habilidades em desenvolvimento
 ## 📞 Suporte
 
 Para dúvidas ou sugestões, entre em contato através do sistema.
->>>>>>> 8d8d7cc (Adição de cadastro e login de empresa e edição de cupons)
 
 ---
 

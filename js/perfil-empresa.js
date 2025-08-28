@@ -175,17 +175,6 @@ function salvarPerfil() {
             localStorage.setItem('lojas', JSON.stringify(lojas));
         }
         
-        // Adicionar ao histórico
-        const historico = JSON.parse(localStorage.getItem('historico') || '[]');
-        historico.unshift({
-            id: Date.now(),
-            titulo: 'Perfil empresarial atualizado',
-            descricao: `Empresa ${razaoSocial} atualizou suas informações`,
-            tipo: 'perfil_empresa_atualizado',
-            data: new Date().toISOString()
-        });
-        localStorage.setItem('historico', JSON.stringify(historico));
-        
         mostrarMensagem('Perfil atualizado com sucesso!', 'success');
         
         setTimeout(() => {
