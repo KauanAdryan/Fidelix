@@ -24,34 +24,6 @@ O Fidelix é um sistema completo de fidelidade que permite aos usuários acumula
 - ✅ Gerenciamento completo de cupons de desconto
 - ✅ Edição de perfil empresarial e alteração de senha
 
-## 🏗️ Estrutura do Projeto
-
-```
-Projeto Pessoal/
-├── index.html                 # Página de login principal
-├── empresa-login.html         # Página de login empresarial
-├── empresa-dashboard.html     # Dashboard empresarial
-├── perfil-usuario.html        # Página de edição de perfil do usuário
-├── perfil-empresa.html        # Página de edição de perfil da empresa
-├── home.html                  # Dashboard do usuário
-├── cadastro.html              # Página de cadastro
-├── config.js                  # Configurações do sistema
-├── css/
-│   ├── home.css              # Estilos do dashboard
-│   ├── loginCadastro.css     # Estilos de login/cadastro
-│   └── style.css             # Estilos gerais
-├── js/
-│   ├── home.js               # Lógica principal do sistema
-│   ├── empresa-login.js      # Lógica de login empresarial
-│   ├── empresa-dashboard.js  # Lógica do dashboard empresarial
-│   ├── perfil-usuario.js     # Lógica de edição de perfil do usuário
-│   ├── perfil-empresa.js     # Lógica de edição de perfil da empresa
-│   ├── loginCadastro.js      # Lógica de login/cadastro
-│   ├── compras.js            # Lógica de compras
-│   └── qr-validator.js       # Validador de QR Code
-└── README.md                 # Documentação
-```
-
 ## 🎯 Como Usar
 
 ### Para Usuários
@@ -121,23 +93,6 @@ O sistema é totalmente responsivo e funciona em:
 - Compatível com navegadores modernos
 - Interface intuitiva e moderna
 - Código modular e bem organizado
-
-## 🔄 Atualizações Recentes
-
-### v2.0 - Sistema Empresarial
-- ✅ Portal empresarial completo
-- ✅ Gerenciamento de cupons empresariais
-- ✅ Validação de CNPJ
-- ✅ Dashboard empresarial
-- ✅ Integração com sistema de compras
-
-### v1.0 - Sistema Básico
-- ✅ Sistema de login/cadastro
-- ✅ Validação de compras
-- ✅ Cupons automáticos
-- ✅ Dashboard do usuário
-
-## 📞 Suporte
 
 Para dúvidas ou sugestões, entre em contato através do sistema.
 
